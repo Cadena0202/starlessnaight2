@@ -473,9 +473,15 @@ async function deleteEntry(id, el) {
   }
 }
 
-function toggleForm() {
-  document.getElementById('entry-form').classList.toggle('open');
-}
+function escHtml(str) {
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // Enterキー
+  document.getElementById('pw-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') window.checkPassword();
+  });
+</script>
 
 // イベントリスナー
 document.getElementById('lock-btn').addEventListener('click', checkPassword);
