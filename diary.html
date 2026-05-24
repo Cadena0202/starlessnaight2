@@ -249,7 +249,7 @@
     <div class="lock-icon">⬡  ✦  ⬡</div>
     <div class="lock-title">enter the password</div>
     <input class="lock-input" type="password" id="pw-input" placeholder="· · · · · ·" />
-    <button class="lock-btn" onclick="checkPassword()">Enter</button>
+    <button class="lock-btn" id="lock-btn">Enter</button>
     <div class="lock-error" id="pw-error"></div>
   </div>
 </div>
@@ -276,7 +276,7 @@
       <div class="diary-header-line"></div>
     </div>
 
-    <button class="new-entry-btn" id="new-entry-btn" onclick="toggleForm()">
+    <button class="new-entry-btn" id="new-entry-btn">
       <span>✦</span> New entry
     </button>
 
@@ -284,8 +284,8 @@
       <input class="form-input" type="text" id="entry-title-input" placeholder="title" />
       <textarea class="form-textarea" id="entry-body-input" placeholder="今日のこと、書いてください。"></textarea>
       <div class="form-actions">
-        <button class="btn-cancel" onclick="toggleForm()">Cancel</button>
-        <button class="btn-post" onclick="postEntry()">Post</button>
+        <button class="btn-cancel" id="btn-cancel">Cancel</button>
+        <button class="btn-post" id="btn-post">Post</button>
       </div>
     </div>
 
@@ -433,6 +433,10 @@
   document.getElementById('pw-input').addEventListener('keydown', e => {
     if (e.key === 'Enter') window.checkPassword();
   });
+  document.getElementById('lock-btn').addEventListener('click', () => window.checkPassword());
+  document.getElementById('new-entry-btn').addEventListener('click', () => window.toggleForm());
+  document.getElementById('btn-cancel').addEventListener('click', () => window.toggleForm());
+  document.getElementById('btn-post').addEventListener('click', () => window.postEntry());
 </script>
 
 <!-- Canvas背景 -->
