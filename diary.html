@@ -73,8 +73,8 @@
     font-size: 12px; color: rgba(220,120,120,0.65); letter-spacing: 0.15em; min-height: 18px;
   }
 
-  /* ---- メイン ---- */
- #main-content { display: none; position: relative; z-index: 10; min-height: 100vh; flex-direction: column; }
+  /* メイン */
+  #main-content { display: none; position: relative; z-index: 10; min-height: 100vh; flex-direction: column; }
   #main-content.visible { display: flex; }
 
   header {
@@ -99,13 +99,135 @@
   nav a:hover::after { width: 100%; }
   nav a.active { color: rgba(200,169,58,0.70); }
 
-  .diary-wrap { max-width: 760px; margin: 0 auto; padding: 64px 48px 80px; width: 100%; }
+  /* ヘッダー画像エリア */
+  .hero-banner {
+    width: 100%; position: relative; z-index: 5;
+    border-bottom: 1px solid rgba(90,180,240,0.08);
+  }
+  .hero-banner img {
+    width: 100%; height: 200px;
+    object-fit: cover; object-position: center; display: block; opacity: 0.88;
+  }
+  .hero-banner-placeholder {
+    width: 100%; height: 140px;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(180deg, rgba(18,26,42,0.50) 0%, rgba(24,34,52,0.30) 100%);
+  }
+  .hero-banner-placeholder span {
+    font-family: 'Cormorant Garamond', serif; font-style: italic;
+    font-size: 11px; color: rgba(160,185,220,0.15); letter-spacing: 0.28em;
+  }
+
+  .diary-wrap { max-width: 760px; margin: 0 auto; padding: 40px 48px 80px; width: 100%; }
   .diary-header { margin-bottom: 48px; display: flex; align-items: baseline; gap: 20px; }
   .diary-header h1 {
     font-family: 'IM Fell English', serif; font-style: italic;
     font-size: 28px; color: rgba(210,225,255,0.70); letter-spacing: 0.08em;
   }
   .diary-header-line { flex: 1; height: 1px; background: linear-gradient(to right, rgba(90,180,240,0.20), transparent); }
+
+  .new-entry-btn {
+    display: none; align-items: center; gap: 10px;
+    background: transparent; border: 1px solid rgba(90,180,240,0.20);
+    color: rgba(160,185,220,0.60); font-family: 'Cormorant Garamond', serif;
+    font-size: 12px; letter-spacing: 0.22em; text-transform: uppercase;
+    padding: 10px 22px; cursor: pointer; transition: all 0.3s; margin-bottom: 36px;
+  }
+  .new-entry-btn.show { display: inline-flex; }
+  .new-entry-btn:hover { border-color: rgba(90,180,240,0.40); color: rgba(200,215,255,0.80); background: rgba(90,180,240,0.04); }
+
+  .entry-form {
+    display: none; flex-direction: column; gap: 16px; margin-bottom: 48px;
+    padding: 28px; border: 1px solid rgba(90,180,240,0.12); background: rgba(8,16,30,0.50);
+  }
+  .entry-form.open { display: flex; }
+  .form-input, .form-textarea {
+    background: rgba(4,8,18,0.60); border: 1px solid rgba(90,180,240,0.12);
+    border-bottom-color: rgba(90,180,240,0.25);
+    color: rgba(210,225,255,0.80); font-family: 'Shippori Mincho', serif;
+    font-size: 14px; padding: 10px 14px; outline: none; resize: none;
+    line-height: 1.9; letter-spacing: 0.04em; transition: border-color 0.3s;
+  }
+  .form-input:focus, .form-textarea:focus { border-color: rgba(90,180,240,0.35); }
+  .form-input::placeholder, .form-textarea::placeholder { color: rgba(160,185,220,0.22); font-style: italic; }
+  .form-textarea { min-height: 140px; }
+  .form-actions { display: flex; gap: 12px; justify-content: flex-end; }
+  .btn-post {
+    background: transparent; border: 1px solid rgba(200,169,58,0.30);
+    color: rgba(200,169,58,0.70); font-family: 'Cormorant Garamond', serif;
+    font-size: 11px; letter-spacing: 0.25em; text-transform: uppercase;
+    padding: 9px 24px; cursor: pointer; transition: all 0.3s;
+  }
+  .btn-post:hover { border-color: rgba(200,169,58,0.55); color: rgba(200,169,58,0.90); background: rgba(200,169,58,0.05); }
+  .btn-cancel {
+    background: transparent; border: 1px solid rgba(90,180,240,0.12);
+    color: rgba(160,185,220,0.40); font-family: 'Cormorant Garamond', serif;
+    font-size: 11px; letter-spacing: 0.25em; text-transform: uppercase;
+    padding: 9px 24px; cursor: pointer; transition: all 0.3s;
+  }
+  .btn-cancel:hover { border-color: rgba(90,180,240,0.25); color: rgba(160,185,220,0.65); }
+
+  .entries { display: flex; flex-direction: column; gap: 36px; }
+  .entry {
+    border-left: 1px solid rgba(90,180,240,0.18); padding-left: 28px;
+    position: relative; opacity: 0; transition: opacity 0.6s ease;
+  }
+  .entry.loaded { opacity: 1; }
+  .entry::before {
+    content: ''; position: absolute; left: -3px; top: 8px;
+    width: 5px; height: 5px; border-radius: 50%; background: rgba(90,180,240,0.40);
+  }
+  .entry-date {
+    font-family: 'Cormorant Garamond', serif; font-style: italic;
+    font-size: 11px; color: rgba(200,169,58,0.45); letter-spacing: 0.20em; margin-bottom: 10px;
+  }
+  .entry-title {
+    font-family: 'IM Fell English', serif; font-size: 17px;
+    color: rgba(210,225,255,0.70); letter-spacing: 0.06em; margin-bottom: 14px;
+  }
+  .entry-body {
+    font-size: 14px; line-height: 2.1;
+    color: rgba(190,210,240,0.60); letter-spacing: 0.04em; white-space: pre-wrap;
+  }
+  .entry-delete {
+    display: none; margin-top: 14px; background: transparent; border: none;
+    color: rgba(220,120,120,0.20); font-family: 'Cormorant Garamond', serif;
+    font-size: 10px; letter-spacing: 0.20em; cursor: pointer; transition: color 0.3s; padding: 0;
+  }
+  .entry-delete.show { display: inline; }
+  .entry-delete:hover { color: rgba(220,120,120,0.55); }
+
+  .empty-note, .loading-note {
+    font-family: 'Cormorant Garamond', serif; font-style: italic;
+    font-size: 13px; color: rgba(160,185,220,0.25); letter-spacing: 0.15em;
+    text-align: center; padding: 60px 0;
+  }
+
+  footer {
+    padding: 24px 48px; border-top: 1px solid rgba(90,180,240,0.06);
+    display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: auto;
+  }
+  .footer-line { flex: 1; max-width: 120px; height: 1px; }
+  .footer-line.blue { background: linear-gradient(to right, transparent, rgba(90,180,240,0.20)); }
+  .footer-line.gold { background: linear-gradient(to left, transparent, rgba(200,169,58,0.20)); }
+  .footer-text {
+    font-family: 'Cormorant Garamond', serif; font-style: italic;
+    font-size: 11px; color: rgba(160,185,220,0.28); letter-spacing: 0.20em;
+  }
+  @keyframes fadein { to { opacity: 1; } }
+  @media (max-width: 600px) {
+    header { padding: 20px 24px; }
+    .diary-wrap { padding: 32px 24px 60px; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="bg"></canvas>
+<div class="corner corner-tl"></div>
+<div class="corner corner-tr"></div>
+<div class="corner corner-bl"></div>
+<div class="corner corner-br"></div>
 
   /* 投稿ボタン（オーナーのみ表示）*/
   .new-entry-btn {
@@ -260,6 +382,43 @@
       <div class="form-actions">
         <button class="btn-cancel" onclick="toggleForm()">Cancel</button>
         <button class="btn-post" onclick="postEntry()">Post</button>
+      </div>
+    </div>
+
+    <div class="entries" id="entries-list">
+      <div class="loading-note">— loading —</div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-line blue"></div>
+    <span class="footer-text">Remember the promise.</span>
+    <div class="footer-line gold"></div>
+  </footer>
+</div>
+
+   <!-- ヘッダー画像エリア（imgのsrcに画像URLを入れると表示されます）-->
+  <div class="hero-banner">
+    <!-- <img src="your-image.jpg" alt=""> -->
+    <div class="hero-banner-placeholder"><span>— header image —</span></div>
+  </div>
+
+  <div class="diary-wrap">
+    <div class="diary-header">
+      <h1>Log</h1>
+      <div class="diary-header-line"></div>
+    </div>
+
+    <button class="new-entry-btn" id="new-entry-btn">
+      <span>✦</span> New entry
+    </button>
+
+    <div class="entry-form" id="entry-form">
+      <input class="form-input" type="text" id="entry-title-input" placeholder="title" />
+      <textarea class="form-textarea" id="entry-body-input" placeholder="今日のこと、書いてください。"></textarea>
+      <div class="form-actions">
+        <button class="btn-cancel" id="btn-cancel">Cancel</button>
+        <button class="btn-post" id="btn-post">Post</button>
       </div>
     </div>
 
