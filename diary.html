@@ -359,30 +359,44 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// ---- パスワード設定 ----
-const READ_PASSWORD  = 'remember';  // 読む用（変えてください）
-const WRITE_PASSWORD = 'azul2024';  // 書く用（絶対に教えないで）
+  // ---- パスワード設定 ----
+  // READ_PASSWORD: 日記を読めるパスワード（他の人にも教えてOK）
+  // WRITE_PASSWORD: 投稿・削除できるパスワード（自分だけ）
+  const READ_PASSWORD  = 'remember';   // ← 好きに変えてください
+  const WRITE_PASSWORD = 'azul2024';   // ← 好きに変えてください（絶対に教えないで）
 
-let isOwner = false;
+  let isOwner = false;
 
-function escHtml(str) {
-  return String(str)
-    .replace(/&/g,'&').replace(/</g,'<')
-    .replace(/>/g,'>').replace(/"/g,'"');
-}
+  window.checkPassword = function() {
+    const val = document.getElementById('pw-input').value;
+    const err = document.getElementById('pw-error');
 
-function unlock() {
-  const lock = document.getElementById('lock-screen');
-  lock.style.opacity = '0';
-  setTimeout(() => {
-    lock.style.display = 'none';
-    document.getElementById('main-content').classList.add('visible');
-    if (isOwner) {
-      document.getElementById('new-entry-btn').classList.add('show');
+    if (val === WRITE_PASSWORD) {
+      isOwner = true;
+      unlock();
+    } else if (val === READ_PASSWORD) {
+      isOwner = false;
+      unlock();
+    } else {
+      err.textContent = 'the key does not fit.';
+      document.getElementById('pw-input').value = '';
+      setTimeout(() => { err.textContent = ''; }, 2500);
     }
-    loadEntries();
-  }, 800);
-}
+  };
+
+  function unlock() {
+    const lock = document.getElementById('lock-screen');
+    lock.style.opacity = '0';
+    setTimeout(() => {
+      lock.style.display = 'none';
+      const main = document.getElementById('main-content');
+      main.classList.add('visible');
+      if (isOwner) {
+        document.getElementById('new-entry-btn').classList.add('visible');
+      }
+      loadEntries();
+    }, 800);
+  }
 
 function checkPassword() {
   const val = document.getElementById('pw-input').value;
