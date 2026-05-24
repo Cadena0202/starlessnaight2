@@ -219,16 +219,8 @@
     header { padding: 20px 24px; }
     .diary-wrap { padding: 32px 24px 60px; }
   }
-</style>
-</head>
-<body>
 
-<canvas id="bg"></canvas>
-<div class="corner corner-tl"></div>
-<div class="corner corner-tr"></div>
-<div class="corner corner-bl"></div>
-<div class="corner corner-br"></div>
-
+    
   /* 投稿ボタン（オーナーのみ表示）*/
   .new-entry-btn {
     display: none;
@@ -338,6 +330,14 @@
 </style>
 </head>
 <body>
+  
+<canvas id="bg"></canvas>
+<div class="corner corner-tl"></div>
+<div class="corner corner-tr"></div>
+<div class="corner corner-bl"></div>
+<div class="corner corner-br"></div>
+
+
 
 <canvas id="bg"></canvas>
 <div class="corner corner-tl"></div>
@@ -402,37 +402,6 @@
     <!-- <img src="your-image.jpg" alt=""> -->
     <div class="hero-banner-placeholder"><span>— header image —</span></div>
   </div>
-
-  <div class="diary-wrap">
-    <div class="diary-header">
-      <h1>Log</h1>
-      <div class="diary-header-line"></div>
-    </div>
-
-    <button class="new-entry-btn" id="new-entry-btn">
-      <span>✦</span> New entry
-    </button>
-
-    <div class="entry-form" id="entry-form">
-      <input class="form-input" type="text" id="entry-title-input" placeholder="title" />
-      <textarea class="form-textarea" id="entry-body-input" placeholder="今日のこと、書いてください。"></textarea>
-      <div class="form-actions">
-        <button class="btn-cancel" id="btn-cancel">Cancel</button>
-        <button class="btn-post" id="btn-post">Post</button>
-      </div>
-    </div>
-
-    <div class="entries" id="entries-list">
-      <div class="loading-note">— loading —</div>
-    </div>
-  </div>
-
-  <footer>
-    <div class="footer-line blue"></div>
-    <span class="footer-text">Remember the promise.</span>
-    <div class="footer-line gold"></div>
-  </footer>
-</div>
 
   <!-- マリンスノー背景 -->
 <script>
