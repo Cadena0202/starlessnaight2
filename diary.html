@@ -215,14 +215,6 @@
 <div class="corner corner-bl"></div>
 <div class="corner corner-br"></div>
 
-
-
-<canvas id="bg"></canvas>
-<div class="corner corner-tl"></div>
-<div class="corner corner-tr"></div>
-<div class="corner corner-bl"></div>
-<div class="corner corner-br"></div>
-
 <!-- パスワード画面 -->
 <div id="lock-screen">
   <div class="lock-box">
@@ -251,12 +243,12 @@
     </div>
 
     <button class="new-entry-btn" id="new-entry-btn" onclick="toggleForm()">
-      <span>✦</span> New entry
+      <span>✦</span> 記入
     </button>
 
     <div class="entry-form" id="entry-form">
       <input class="form-input" type="text" id="entry-title-input" placeholder="title" />
-      <textarea class="form-textarea" id="entry-body-input" placeholder="今日のこと、書いてください。"></textarea>
+      <textarea class="form-textarea" id="entry-body-input" placeholder="何を書こうかな"></textarea>
       <div class="form-actions">
         <button class="btn-cancel" onclick="toggleForm()">Cancel</button>
         <button class="btn-post" onclick="postEntry()">Post</button>
