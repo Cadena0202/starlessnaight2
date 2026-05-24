@@ -4,14 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Log — Remember the promise.</title>
-<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Shippori+Mincho:wght@400;500&display=swap" rel="stylesheet">
+<link href="fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Shippori+Mincho:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --deep: #04060d;
+    --deep: #111620;
     --blue: #5ab4f0;
     --mustard: #c8a93a;
-    --text: rgba(210,225,255,0.75);
-    --text-dim: rgba(160,185,220,0.45);
+    --text: rgba(220,230,245,0.78);
+    --text-dim: rgba(170,190,215,0.48);
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html, body {
@@ -23,8 +23,28 @@
   canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
   body::after {
     content: ''; position: fixed; inset: 0; z-index: 1;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-    background-size: 180px; opacity: 0.35; pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    background-size: 180px; opacity: 0.28; pointer-events: none;
+  }
+  /* ヘッダー画像エリア */
+  .hero-banner {
+    width: 100%; max-height: 220px; overflow: hidden; position: relative;
+    z-index: 5;
+  }
+  .hero-banner img {
+    width: 100%; height: 220px;
+    object-fit: cover; object-position: center;
+    display: block; opacity: 0.88;
+  }
+  .hero-banner-placeholder {
+    width: 100%; height: 160px;
+    display: flex; align-items: center; justify-content: center;
+    border-bottom: 1px solid rgba(90,180,240,0.08);
+    background: linear-gradient(180deg, rgba(18,26,42,0.60) 0%, rgba(24,34,52,0.40) 100%);
+  }
+  .hero-banner-placeholder span {
+    font-family: 'Cormorant Garamond', serif; font-style: italic;
+    font-size: 11px; color: rgba(160,185,220,0.18); letter-spacing: 0.28em;
   }
   .corner { position: fixed; width: 22px; height: 22px; border-style: solid; z-index: 20; pointer-events: none; }
   .corner-tl { top: 12px; left: 12px;  border-color: rgba(90,180,240,0.22); border-width: 1px 0 0 1px; }
@@ -99,7 +119,7 @@
   nav a:hover::after { width: 100%; }
   nav a.active { color: rgba(200,169,58,0.70); }
 
-  .diary-wrap { max-width: 760px; margin: 0 auto; padding: 64px 48px 80px; width: 100%; }
+  .diary-wrap { max-width: 760px; margin: 0 auto; padding: 40px 48px 80px; width: 100%; }
   .diary-header { margin-bottom: 48px; display: flex; align-items: baseline; gap: 20px; }
   .diary-header h1 {
     font-family: 'IM Fell English', serif; font-style: italic;
@@ -226,7 +246,7 @@
 <!-- パスワード画面 -->
 <div id="lock-screen">
   <div class="lock-box">
-    <div class="lock-icon">⬡ &nbsp;✦&nbsp; ⬡</div>
+    <div class="lock-icon">⬡  ✦  ⬡</div>
     <div class="lock-title">enter the password</div>
     <input class="lock-input" type="password" id="pw-input" placeholder="· · · · · ·" />
     <button class="lock-btn" onclick="checkPassword()">Enter</button>
@@ -243,6 +263,12 @@
       <a href="diary.html" class="active">Log</a>
     </nav>
   </header>
+
+  <!-- ヘッダー画像：imgタグのsrcに画像URLを入れてください -->
+  <div class="hero-banner">
+    <!-- <img src="your-image.jpg" alt=""> -->
+    <div class="hero-banner-placeholder"><span>— header image —</span></div>
+  </div>
 
   <div class="diary-wrap">
     <div class="diary-header">
@@ -277,9 +303,9 @@
 
 <!-- Firebase -->
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+  import { initializeApp } from "www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
   import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, orderBy, query }
-    from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
+    from "www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyDeO0QZ1wmxGmEcyu9W3SgSos1Y4T-4TYA",
@@ -400,7 +426,7 @@
   };
 
   function escHtml(str) {
-    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    return String(str).replace(/&/g,'&').replace(/</g,'<').replace(/>/g,'>').replace(/"/g,'"');
   }
 
   // Enterキー
