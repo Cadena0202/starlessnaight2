@@ -4,651 +4,438 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Log — Remember the promise.</title>
-
-<link href="fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Shippori+Mincho:wght@400;500&display=swap" rel="stylesheet">
-
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Shippori+Mincho:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root {
-  --deep: #111620;
-  --blue: #5ab4f0;
-  --mustard: #c8a93a;
-  --text: rgba(220,230,245,0.78);
-}
+  :root {
+    --deep: #04060d;
+    --blue: #5ab4f0;
+    --mustard: #c8a93a;
+    --text: rgba(210,225,255,0.75);
+    --text-dim: rgba(160,185,220,0.45);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    width: 100%; min-height: 100vh;
+    background: var(--deep); color: var(--text);
+    font-family: 'Shippori Mincho', serif;
+    overflow-x: hidden; cursor: crosshair;
+  }
+  canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+  body::after {
+    content: ''; position: fixed; inset: 0; z-index: 1;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    background-size: 180px; opacity: 0.35; pointer-events: none;
+  }
+  .corner { position: fixed; width: 22px; height: 22px; border-style: solid; z-index: 20; pointer-events: none; }
+  .corner-tl { top: 12px; left: 12px;  border-color: rgba(90,180,240,0.22); border-width: 1px 0 0 1px; }
+  .corner-tr { top: 12px; right: 12px; border-color: rgba(200,169,58,0.22); border-width: 1px 1px 0 0; }
+  .corner-bl { bottom: 12px; left: 12px;  border-color: rgba(200,169,58,0.22); border-width: 0 0 1px 1px; }
+  .corner-br { bottom: 12px; right: 12px; border-color: rgba(90,180,240,0.22); border-width: 0 1px 1px 0; }
 
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-}
-
-html,body{
-  width:100%;
-  min-height:100vh;
-  background:var(--deep);
-  color:var(--text);
-  font-family:'Shippori Mincho', serif;
-  overflow-x:hidden;
-  cursor:crosshair;
-}
-
-canvas{
-  position:fixed;
-  inset:0;
-  z-index:0;
-  pointer-events:none;
-}
-
-body::after{
-  content:'';
-  position:fixed;
-  inset:0;
-  z-index:1;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-  background-size:180px;
-  opacity:0.28;
-  pointer-events:none;
-}
-
-.corner{
-  position:fixed;
-  width:22px;
-  height:22px;
-  border-style:solid;
-  z-index:20;
-  pointer-events:none;
-}
-
-.corner-tl{
-  top:12px;
-  left:12px;
-  border-color:rgba(90,180,240,0.22);
-  border-width:1px 0 0 1px;
-}
-
-.corner-tr{
-  top:12px;
-  right:12px;
-  border-color:rgba(200,169,58,0.22);
-  border-width:1px 1px 0 0;
-}
-
-.corner-bl{
-  bottom:12px;
-  left:12px;
-  border-color:rgba(200,169,58,0.22);
-  border-width:0 0 1px 1px;
-}
-
-.corner-br{
-  bottom:12px;
-  right:12px;
-  border-color:rgba(90,180,240,0.22);
-  border-width:0 1px 1px 0;
-}
-
-/* lock */
-
-#lock-screen{
-  position:fixed;
-  inset:0;
-  z-index:100;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:rgba(8,10,18,0.97);
-  backdrop-filter:blur(12px);
-  transition:opacity 0.8s ease;
-}
-
-.lock-box{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:28px;
-}
-
-.lock-icon{
-  font-size:26px;
-  opacity:0.28;
-}
-
-.lock-title{
-  font-family:'IM Fell English', serif;
-  font-style:italic;
-  font-size:14px;
-  color:rgba(210,225,255,0.42);
-  letter-spacing:0.22em;
-}
-
-.lock-input{
-  background:rgba(8,16,30,0.80);
-  border:1px solid rgba(90,180,240,0.18);
-  color:rgba(210,225,255,0.80);
-  font-family:'Cormorant Garamond', serif;
-  font-size:16px;
-  letter-spacing:0.25em;
-  padding:12px 20px;
-  width:220px;
-  text-align:center;
-  outline:none;
-}
-
-.lock-btn{
-  background:transparent;
-  border:1px solid rgba(200,169,58,0.30);
-  color:rgba(200,169,58,0.65);
-  font-family:'Cormorant Garamond', serif;
-  font-size:11px;
-  letter-spacing:0.28em;
-  text-transform:uppercase;
-  padding:10px 28px;
-  cursor:pointer;
-}
-
-.lock-error{
-  font-family:'Cormorant Garamond', serif;
-  font-style:italic;
-  font-size:12px;
-  color:rgba(220,120,120,0.65);
-  min-height:18px;
-}
-
-/* main */
-
-#main-content{
-  display:none;
-  position:relative;
-  z-index:10;
-  min-height:100vh;
-  flex-direction:column;
-}
-
-#main-content.visible{
-  display:flex;
-}
-
-header{
-  padding:28px 48px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  border-bottom:1px solid rgba(90,180,240,0.08);
-}
-
-.site-title{
-  font-family:'IM Fell English', serif;
-  font-style:italic;
-  font-size:15px;
-  color:rgba(210,225,255,0.50);
-  letter-spacing:0.18em;
-  text-decoration:none;
-}
-
-nav{
-  display:flex;
-  gap:36px;
-}
-
-nav a{
-  font-family:'Cormorant Garamond', serif;
-  font-size:12px;
-  color:rgba(160,185,220,0.45);
-  text-decoration:none;
-  letter-spacing:0.22em;
-  text-transform:uppercase;
-}
-
-.hero-banner{
-  width:100%;
-  border-bottom:1px solid rgba(90,180,240,0.08);
-}
-
-.hero-banner-placeholder{
-  width:100%;
-  height:140px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:linear-gradient(
-    180deg,
-    rgba(18,26,42,0.50) 0%,
-    rgba(24,34,52,0.30) 100%
-  );
-}
-
-.hero-banner-placeholder span{
-  font-family:'Cormorant Garamond', serif;
-  font-style:italic;
-  font-size:11px;
-  color:rgba(160,185,220,0.15);
-  letter-spacing:0.28em;
-}
-
-.diary-wrap{
-  max-width:760px;
-  margin:0 auto;
-  padding:40px 48px 80px;
-  width:100%;
-}
-
-.diary-header{
-  margin-bottom:48px;
-  display:flex;
-  align-items:baseline;
-  gap:20px;
-}
-
-.diary-header h1{
-  font-family:'IM Fell English', serif;
-  font-style:italic;
-  font-size:28px;
-  color:rgba(210,225,255,0.70);
-}
-
-.diary-header-line{
-  flex:1;
-  height:1px;
-  background:linear-gradient(
-    to right,
-    rgba(90,180,240,0.20),
-    transparent
-  );
-}
-
-.entries{
-  display:flex;
-  flex-direction:column;
-  gap:36px;
-}
-
-.entry{
-  border-left:1px solid rgba(90,180,240,0.18);
-  padding-left:28px;
-}
-
-.entry-date{
-  font-family:'Cormorant Garamond', serif;
-  font-style:italic;
-  font-size:11px;
-  color:rgba(200,169,58,0.45);
-  margin-bottom:10px;
-}
-
-.entry-title{
-  font-family:'IM Fell English', serif;
-  font-size:17px;
-  color:rgba(210,225,255,0.70);
-  margin-bottom:14px;
-}
-
-.entry-body{
-  font-size:14px;
-  line-height:2.1;
-  color:rgba(190,210,240,0.60);
-  white-space:pre-wrap;
-}
-
-.loading-note,
-.empty-note{
-  text-align:center;
-  padding:60px 0;
-  font-family:'Cormorant Garamond', serif;
-  font-style:italic;
-  color:rgba(160,185,220,0.25);
-}
-
-footer{
-  padding:24px 48px;
-  border-top:1px solid rgba(90,180,240,0.06);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:16px;
-  margin-top:auto;
-}
-
-.footer-text{
-  font-family:'Cormorant Garamond', serif;
-  font-style:italic;
-  font-size:11px;
-  color:rgba(160,185,220,0.28);
-}
-
-@media (max-width:600px){
-  header{
-    padding:20px 24px;
+  /* ---- パスワード画面 ---- */
+  #lock-screen {
+    position: fixed; inset: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(4,6,13,0.97); backdrop-filter: blur(12px);
+    transition: opacity 0.8s ease;
+  }
+  .lock-box {
+    display: flex; flex-direction: column; align-items: center; gap: 28px;
+    opacity: 0; animation: fadein 1.2s ease 0.3s forwards;
+  }
+  .lock-icon { font-size: 26px; opacity: 0.30; letter-spacing: 0.1em; }
+  .lock-title {
+    font-family: 'IM Fell English', serif; font-style: italic;
+    font-size: 14px; color: rgba(210,225,255,0.45); letter-spacing: 0.22em;
+  }
+  .lock-input {
+    background: rgba(8,16,30,0.80);
+    border: 1px solid rgba(90,180,240,0.18);
+    color: rgba(210,225,255,0.80);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px; letter-spacing: 0.25em;
+    padding: 12px 20px; width: 220px; text-align: center; outline: none;
+    transition: border-color 0.3s;
+  }
+  .lock-input:focus { border-color: rgba(90,180,240,0.40); }
+  .lock-input::placeholder { color: rgba(160,185,220,0.22); font-style: italic; letter-spacing: 0.15em; }
+  .lock-btn {
+    background: transparent;
+    border: 1px solid rgba(200,169,58,0.30);
+    color: rgba(200,169,58,0.65);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 11px; letter-spacing: 0.28em; text-transform: uppercase;
+    padding: 10px 28px; cursor: pointer; transition: all 0.3s;
+  }
+  .lock-btn:hover { border-color: rgba(200,169,58,0.55); color: rgba(200,169,58,0.90); background: rgba(200,169,58,0.05); }
+  .lock-error {
+    font-family: 'Cormorant Garamond', serif; font-style: italic;
+    font-size: 12px; color: rgba(220,120,120,0.65); letter-spacing: 0.15em; min-height: 18px;
   }
 
-  .diary-wrap{
-    padding:32px 24px 60px;
+  /* ---- メイン ---- */
+  #main-content { display: none; position: relative; z-index: 10; min-height: 100vh; flex-direction: column; }
+  #main-content.visible { display: flex; }
+
+  header {
+    padding: 28px 48px; display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid rgba(90,180,240,0.08);
   }
-}
+  .site-title {
+    font-family: 'IM Fell English', serif; font-style: italic;
+    font-size: 15px; color: rgba(210,225,255,0.50); letter-spacing: 0.18em; text-decoration: none;
+  }
+  nav { display: flex; gap: 36px; align-items: center; }
+  nav a {
+    font-family: 'Cormorant Garamond', serif; font-size: 12px;
+    color: rgba(160,185,220,0.45); text-decoration: none;
+    letter-spacing: 0.22em; text-transform: uppercase; transition: color 0.3s; position: relative;
+  }
+  nav a::after {
+    content: ''; position: absolute; bottom: -3px; left: 0;
+    width: 0; height: 1px; background: var(--mustard); transition: width 0.3s; opacity: 0.6;
+  }
+  nav a:hover { color: rgba(200,210,255,0.80); }
+  nav a:hover::after { width: 100%; }
+  nav a.active { color: rgba(200,169,58,0.70); }
+
+  .diary-wrap { max-width: 760px; margin: 0 auto; padding: 64px 48px 80px; width: 100%; }
+  .diary-header { margin-bottom: 48px; display: flex; align-items: baseline; gap: 20px; }
+  .diary-header h1 {
+    font-family: 'IM Fell English', serif; font-style: italic;
+    font-size: 28px; color: rgba(210,225,255,0.70); letter-spacing: 0.08em;
+  }
+  .diary-header-line { flex: 1; height: 1px; background: linear-gradient(to right, rgba(90,180,240,0.20), transparent); }
+
+  /* 投稿ボタン（オーナーのみ表示）*/
+  .new-entry-btn {
+    display: none;
+    align-items: center; gap: 10px;
+    background: transparent; border: 1px solid rgba(90,180,240,0.20);
+    color: rgba(160,185,220,0.60);
+    font-family: 'Cormorant Garamond', serif; font-size: 12px;
+    letter-spacing: 0.22em; text-transform: uppercase;
+    padding: 10px 22px; cursor: pointer; transition: all 0.3s; margin-bottom: 36px;
+  }
+  .new-entry-btn.visible { display: inline-flex; }
+  .new-entry-btn:hover { border-color: rgba(90,180,240,0.40); color: rgba(200,215,255,0.80); background: rgba(90,180,240,0.04); }
+
+  .entry-form {
+    display: none; flex-direction: column; gap: 16px; margin-bottom: 48px;
+    padding: 28px; border: 1px solid rgba(90,180,240,0.12); background: rgba(8,16,30,0.50);
+  }
+  .entry-form.open { display: flex; }
+
+  .form-input, .form-textarea {
+    background: rgba(4,8,18,0.60); border: 1px solid rgba(90,180,240,0.12);
+    border-bottom-color: rgba(90,180,240,0.25);
+    color: rgba(210,225,255,0.80); font-family: 'Shippori Mincho', serif;
+    font-size: 14px; padding: 10px 14px; outline: none; resize: none;
+    line-height: 1.9; letter-spacing: 0.04em; transition: border-color 0.3s;
+  }
+  .form-input:focus, .form-textarea:focus { border-color: rgba(90,180,240,0.35); }
+  .form-input::placeholder, .form-textarea::placeholder { color: rgba(160,185,220,0.22); font-style: italic; }
+  .form-textarea { min-height: 140px; }
+  .form-actions { display: flex; gap: 12px; justify-content: flex-end; }
+
+  .btn-post {
+    background: transparent; border: 1px solid rgba(200,169,58,0.30);
+    color: rgba(200,169,58,0.70); font-family: 'Cormorant Garamond', serif;
+    font-size: 11px; letter-spacing: 0.25em; text-transform: uppercase;
+    padding: 9px 24px; cursor: pointer; transition: all 0.3s;
+  }
+  .btn-post:hover { border-color: rgba(200,169,58,0.55); color: rgba(200,169,58,0.90); background: rgba(200,169,58,0.05); }
+  .btn-cancel {
+    background: transparent; border: 1px solid rgba(90,180,240,0.12);
+    color: rgba(160,185,220,0.40); font-family: 'Cormorant Garamond', serif;
+    font-size: 11px; letter-spacing: 0.25em; text-transform: uppercase;
+    padding: 9px 24px; cursor: pointer; transition: all 0.3s;
+  }
+  .btn-cancel:hover { border-color: rgba(90,180,240,0.25); color: rgba(160,185,220,0.65); }
+
+  .entries { display: flex; flex-direction: column; gap: 36px; }
+  .entry {
+    border-left: 1px solid rgba(90,180,240,0.18); padding-left: 28px;
+    position: relative; opacity: 0; transition: opacity 0.6s ease;
+  }
+  .entry.loaded { opacity: 1; }
+  .entry::before {
+    content: ''; position: absolute; left: -3px; top: 8px;
+    width: 5px; height: 5px; border-radius: 50%; background: rgba(90,180,240,0.40);
+  }
+  .entry-date {
+    font-family: 'Cormorant Garamond', serif; font-style: italic;
+    font-size: 11px; color: rgba(200,169,58,0.45); letter-spacing: 0.20em; margin-bottom: 10px;
+  }
+  .entry-title {
+    font-family: 'IM Fell English', serif; font-size: 17px;
+    color: rgba(210,225,255,0.70); letter-spacing: 0.06em; margin-bottom: 14px;
+  }
+  .entry-body {
+    font-size: 14px; line-height: 2.1;
+    color: rgba(190,210,240,0.60); letter-spacing: 0.04em; white-space: pre-wrap;
+  }
+  .entry-delete {
+    margin-top: 14px; background: transparent; border: none;
+    color: rgba(220,120,120,0.20); font-family: 'Cormorant Garamond', serif;
+    font-size: 10px; letter-spacing: 0.20em; cursor: pointer; transition: color 0.3s; padding: 0;
+    display: none;
+  }
+  .entry-delete.owner-only { display: inline; }
+  .entry-delete:hover { color: rgba(220,120,120,0.55); }
+
+  .empty-note {
+    font-family: 'Cormorant Garamond', serif; font-style: italic;
+    font-size: 13px; color: rgba(160,185,220,0.25); letter-spacing: 0.15em;
+    text-align: center; padding: 60px 0;
+  }
+
+  .loading-note {
+    font-family: 'Cormorant Garamond', serif; font-style: italic;
+    font-size: 13px; color: rgba(160,185,220,0.25); letter-spacing: 0.15em;
+    text-align: center; padding: 40px 0;
+  }
+
+  footer {
+    padding: 24px 48px; border-top: 1px solid rgba(90,180,240,0.06);
+    display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: auto;
+  }
+  .footer-line { flex: 1; max-width: 120px; height: 1px; }
+  .footer-line.blue { background: linear-gradient(to right, transparent, rgba(90,180,240,0.20)); }
+  .footer-line.gold { background: linear-gradient(to left,  transparent, rgba(200,169,58,0.20)); }
+  .footer-text {
+    font-family: 'Cormorant Garamond', serif; font-style: italic;
+    font-size: 11px; color: rgba(160,185,220,0.28); letter-spacing: 0.20em;
+  }
+
+  @keyframes fadein { to { opacity: 1; } }
+  @media (max-width: 600px) {
+    header { padding: 20px 24px; }
+    .diary-wrap { padding: 48px 24px 60px; }
+  }
 </style>
 </head>
-
 <body>
 
 <canvas id="bg"></canvas>
-
 <div class="corner corner-tl"></div>
 <div class="corner corner-tr"></div>
 <div class="corner corner-bl"></div>
 <div class="corner corner-br"></div>
 
-<!-- lock -->
-
+<!-- パスワード画面 -->
 <div id="lock-screen">
   <div class="lock-box">
-    <div class="lock-icon">⬡ ✦ ⬡</div>
-
-    <div class="lock-title">
-      enter the password
-    </div>
-
-    <input
-      class="lock-input"
-      type="password"
-      id="pw-input"
-      placeholder="· · · · · ·"
-    >
-
-    <button
-      class="lock-btn"
-      onclick="checkPassword()"
-    >
-      Enter
-    </button>
-
+    <div class="lock-icon">⬡ &nbsp;✦&nbsp; ⬡</div>
+    <div class="lock-title">enter the password</div>
+    <input class="lock-input" type="password" id="pw-input" placeholder="· · · · · ·" />
+    <button class="lock-btn" onclick="checkPassword()">Enter</button>
     <div class="lock-error" id="pw-error"></div>
   </div>
 </div>
 
-<!-- main -->
-
+<!-- メインコンテンツ -->
 <div id="main-content">
+  <header>
+    <a href="index.html" class="site-title">Remember the promise.</a>
+    <nav>
+      <a href="index.html">Top</a>
+      <a href="diary.html" class="active">Log</a>
+    </nav>
+  </header>
 
-<header>
-  <a href="index.html" class="site-title">
-    Remember the promise.
-  </a>
+  <div class="diary-wrap">
+    <div class="diary-header">
+      <h1>Log</h1>
+      <div class="diary-header-line"></div>
+    </div>
 
-  <nav>
-    <a href="index.html">Top</a>
-    <a href="diary.html">Log</a>
-  </nav>
-</header>
+    <button class="new-entry-btn" id="new-entry-btn" onclick="toggleForm()">
+      <span>✦</span> New entry
+    </button>
 
-<div class="hero-banner">
-  <div class="hero-banner-placeholder">
-    <span>— header image —</span>
+    <div class="entry-form" id="entry-form">
+      <input class="form-input" type="text" id="entry-title-input" placeholder="title" />
+      <textarea class="form-textarea" id="entry-body-input" placeholder="今日のこと、書いてください。"></textarea>
+      <div class="form-actions">
+        <button class="btn-cancel" onclick="toggleForm()">Cancel</button>
+        <button class="btn-post" onclick="postEntry()">Post</button>
+      </div>
+    </div>
+
+    <div class="entries" id="entries-list">
+      <div class="loading-note">— loading —</div>
+    </div>
   </div>
+
+  <footer>
+    <div class="footer-line blue"></div>
+    <span class="footer-text">Remember the promise.</span>
+    <div class="footer-line gold"></div>
+  </footer>
 </div>
 
-<div class="diary-wrap">
+<!-- Firebase -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+  import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, orderBy, query }
+    from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
 
-  <div class="diary-header">
-    <h1>Log</h1>
-    <div class="diary-header-line"></div>
-  </div>
+  const firebaseConfig = {
+    apiKey: "AIzaSyDeO0QZ1wmxGmEcyu9W3SgSos1Y4T-4TYA",
+    authDomain: "azul-1a3c9.firebaseapp.com",
+    projectId: "azul-1a3c9",
+    storageBucket: "azul-1a3c9.firebasestorage.app",
+    messagingSenderId: "107176111624",
+    appId: "1:107176111624:web:78bc25fbe09bcd3b47ebbd",
+    measurementId: "G-N409CFN5J6"
+  };
 
-  <div class="entries" id="entries-list">
-    <div class="loading-note">— loading —</div>
-  </div>
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
 
-</div>
+  // ---- パスワード設定 ----
+  // READ_PASSWORD: 日記を読めるパスワード（他の人にも教えてOK）
+  // WRITE_PASSWORD: 投稿・削除できるパスワード（自分だけ）
+  const READ_PASSWORD  = 'remember';   // ← 好きに変えてください
+  const WRITE_PASSWORD = 'azul2024';   // ← 好きに変えてください（絶対に教えないで）
 
-<footer>
-  <span class="footer-text">
-    Remember the promise.
-  </span>
-</footer>
+  let isOwner = false;
 
-</div>
+  window.checkPassword = function() {
+    const val = document.getElementById('pw-input').value;
+    const err = document.getElementById('pw-error');
 
-<!-- background -->
+    if (val === WRITE_PASSWORD) {
+      isOwner = true;
+      unlock();
+    } else if (val === READ_PASSWORD) {
+      isOwner = false;
+      unlock();
+    } else {
+      err.textContent = 'the key does not fit.';
+      document.getElementById('pw-input').value = '';
+      setTimeout(() => { err.textContent = ''; }, 2500);
+    }
+  };
 
+  function unlock() {
+    const lock = document.getElementById('lock-screen');
+    lock.style.opacity = '0';
+    setTimeout(() => {
+      lock.style.display = 'none';
+      const main = document.getElementById('main-content');
+      main.classList.add('visible');
+      if (isOwner) {
+        document.getElementById('new-entry-btn').classList.add('visible');
+      }
+      loadEntries();
+    }, 800);
+  }
+
+  async function loadEntries() {
+    const list = document.getElementById('entries-list');
+    list.innerHTML = '<div class="loading-note">— loading —</div>';
+    try {
+      const q = query(collection(db, 'entries'), orderBy('createdAt', 'desc'));
+      const snap = await getDocs(q);
+      list.innerHTML = '';
+      if (snap.empty) {
+        list.innerHTML = '<div class="empty-note">— まだ何も書かれていない —</div>';
+        return;
+      }
+      snap.forEach((docSnap, i) => {
+        const d = docSnap.data();
+        const el = document.createElement('div');
+        el.className = 'entry';
+        el.innerHTML = `
+          <div class="entry-date">${escHtml(d.date || '')}</div>
+          <div class="entry-title">${escHtml(d.title || '— 無題 —')}</div>
+          <div class="entry-body">${escHtml(d.body || '')}</div>
+          ${isOwner ? `<button class="entry-delete owner-only" onclick="deleteEntry('${docSnap.id}', this)">delete</button>` : ''}
+        `;
+        list.appendChild(el);
+        setTimeout(() => el.classList.add('loaded'), i * 80);
+      });
+    } catch(e) {
+      list.innerHTML = '<div class="empty-note">— 読み込みに失敗しました —</div>';
+    }
+  }
+
+  window.postEntry = async function() {
+    if (!isOwner) return;
+    const title = document.getElementById('entry-title-input').value.trim();
+    const body  = document.getElementById('entry-body-input').value.trim();
+    if (!body) return;
+    const now = new Date();
+    const date = now.toLocaleDateString('ja-JP', { year:'numeric', month:'long', day:'numeric', weekday:'short' });
+    try {
+      await addDoc(collection(db, 'entries'), {
+        title: title || '— 無題 —', body, date,
+        createdAt: now.getTime()
+      });
+      document.getElementById('entry-title-input').value = '';
+      document.getElementById('entry-body-input').value = '';
+      toggleForm();
+      loadEntries();
+    } catch(e) {
+      alert('投稿に失敗しました。');
+    }
+  };
+
+  window.deleteEntry = async function(id, btn) {
+    if (!isOwner) return;
+    try {
+      await deleteDoc(doc(db, 'entries', id));
+      const entry = btn.closest('.entry');
+      entry.style.opacity = '0';
+      setTimeout(() => { entry.remove(); }, 400);
+    } catch(e) {
+      alert('削除に失敗しました。');
+    }
+  };
+
+  window.toggleForm = function() {
+    document.getElementById('entry-form').classList.toggle('open');
+  };
+
+  function escHtml(str) {
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // Enterキー
+  document.getElementById('pw-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') window.checkPassword();
+  });
+</script>
+
+<!-- Canvas背景 -->
 <script>
 const canvas = document.getElementById('bg');
 const ctx = canvas.getContext('2d');
-
-let W,H;
-
-function resize(){
-  W = canvas.width = window.innerWidth;
-  H = canvas.height = window.innerHeight;
-}
-
+let W, H;
+function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
 resize();
-
 window.addEventListener('resize', resize);
-
-const SNOW_COUNT = 55;
-
-const snow = Array.from({length:SNOW_COUNT},()=>({
-  x:Math.random(),
-  y:Math.random(),
-  r:Math.random()*1.8+0.4,
-  speed:Math.random()*0.00012+0.00004,
-  alpha:Math.random()*0.35+0.08,
-  wobble:Math.random()*Math.PI*2,
-  wobbleSpeed:Math.random()*0.001+0.0003,
-}));
-
-function draw(){
-
-  ctx.clearRect(0,0,W,H);
-
-  const bg = ctx.createLinearGradient(0,0,0,H);
-
-  bg.addColorStop(0,'#0c1019');
-  bg.addColorStop(0.5,'#141c2a');
-  bg.addColorStop(1,'#1c2636');
-
-  ctx.fillStyle = bg;
-  ctx.fillRect(0,0,W,H);
-
-  for(const p of snow){
-
-    p.y -= p.speed;
-    p.wobble += p.wobbleSpeed;
-
-    if(p.y < -0.02){
-      p.y = 1.02;
-      p.x = Math.random();
-    }
-
-    const px = (p.x + Math.sin(p.wobble)*0.018)*W;
-    const py = p.y*H;
-
-    ctx.beginPath();
-    ctx.arc(px,py,p.r,0,Math.PI*2);
-
-    ctx.fillStyle =
-      `rgba(200,220,255,${p.alpha})`;
-
-    ctx.fill();
+function draw(t) {
+  ctx.clearRect(0, 0, W, H);
+  const cx = W / 2, cy = H / 2;
+  const bg = ctx.createRadialGradient(cx, cy*0.8, 0, cx, cy, Math.max(W,H)*0.8);
+  bg.addColorStop(0,'#101828'); bg.addColorStop(0.4,'#080e1c'); bg.addColorStop(1,'#03050c');
+  ctx.fillStyle = bg; ctx.fillRect(0,0,W,H);
+  for (let i=0;i<4;i++) {
+    const prog=((t*0.00016+i/4)%1);
+    const r=prog*Math.min(W,H)*0.50+10;
+    const a=(1-prog)*0.11;
+    ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2);
+    ctx.strokeStyle=`rgba(120,175,240,${a})`; ctx.lineWidth=0.8; ctx.stroke();
   }
-
+  const p=ctx.createLinearGradient(cx,0,cx,H);
+  p.addColorStop(0,'rgba(90,160,255,0)'); p.addColorStop(0.5,'rgba(120,185,255,0.05)'); p.addColorStop(1,'rgba(90,160,255,0)');
+  ctx.fillStyle=p; ctx.fillRect(cx-50,0,100,H);
   requestAnimationFrame(draw);
 }
-
-draw();
+requestAnimationFrame(draw);
 </script>
-
-<!-- firebase -->
-
-<script type="module">
-
-import {
-  initializeApp
-} from "www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
-
-import {
-  getFirestore,
-  collection,
-  getDocs,
-  query,
-  orderBy
-} from "www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
-
-const firebaseConfig = {
-
-  apiKey: "AIzaSyDeO0QZ1wmxGmEcyu9W3SgSos1Y4T-4TYA",
-
-  authDomain: "azul-1a3c9.firebaseapp.com",
-
-  projectId: "azul-1a3c9",
-
-  storageBucket: "azul-1a3c9.firebasestorage.app",
-
-  messagingSenderId: "107176111624",
-
-  appId: "1:107176111624:web:78bc25fbe09bcd3b47ebbd",
-
-  measurementId: "G-N409CFN5J6"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-const READ_PASSWORD = "remember";
-const WRITE_PASSWORD = "azul2024";
-
-let isOwner = false;
-
-function escHtml(str){
-  return String(str)
-    .replace(/&/g,'&')
-    .replace(/</g,'<')
-    .replace(/>/g,'>')
-    .replace(/"/g,'"');
-}
-
-function unlock(){
-
-  const lock =
-    document.getElementById('lock-screen');
-
-  lock.style.opacity = '0';
-
-  setTimeout(()=>{
-
-    lock.style.display = 'none';
-
-    document
-      .getElementById('main-content')
-      .classList.add('visible');
-
-    loadEntries();
-
-  },800);
-}
-
-window.checkPassword = function(){
-
-  const val =
-    document.getElementById('pw-input').value;
-
-  const err =
-    document.getElementById('pw-error');
-
-  if(val === WRITE_PASSWORD){
-
-    isOwner = true;
-    unlock();
-
-  }else if(val === READ_PASSWORD){
-
-    isOwner = false;
-    unlock();
-
-  }else{
-
-    err.textContent =
-      'the key does not fit.';
-
-    document
-      .getElementById('pw-input')
-      .value = '';
-
-    setTimeout(()=>{
-      err.textContent = '';
-    },2500);
-  }
-}
-
-window.addEventListener('keydown',(e)=>{
-
-  if(e.key === 'Enter'){
-    window.checkPassword();
-  }
-
-});
-
-async function loadEntries(){
-
-  const list =
-    document.getElementById('entries-list');
-
-  list.innerHTML =
-    '<div class="loading-note">— loading —</div>';
-
-  try{
-
-    const q = query(
-      collection(db,'entries'),
-      orderBy('createdAt','desc')
-    );
-
-    const snap = await getDocs(q);
-
-    list.innerHTML = '';
-
-    if(snap.empty){
-
-      list.innerHTML =
-        '<div class="empty-note">— まだ何も書かれていない —</div>';
-
-      return;
-    }
-
-    snap.forEach((docSnap)=>{
-
-      const d = docSnap.data();
-
-      const el =
-        document.createElement('div');
-
-      el.className = 'entry';
-
-      el.innerHTML = `
-        <div class="entry-date">
-          ${escHtml(d.date || '')}
-        </div>
-
-        <div class="entry-title">
-          ${escHtml(d.title || '— 無題 —')}
-        </div>
-
-        <div class="entry-body">
-          ${escHtml(d.body || '')}
-        </div>
-      `;
-
-      list.appendChild(el);
-
-    });
-
-  }catch(e){
-
-    console.error(e);
-
-    list.innerHTML =
-      '<div class="empty-note">— 読み込みに失敗しました —</div>';
-  }
-}
-
-</script>
-
 </body>
 </html>
