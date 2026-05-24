@@ -275,6 +275,43 @@
   </footer>
 </div>
 
+   <!-- ヘッダー画像エリア（imgのsrcに画像URLを入れると表示されます）-->
+  <div class="hero-banner">
+    <!-- <img src="your-image.jpg" alt=""> -->
+    <div class="hero-banner-placeholder"><span>— header image —</span></div>
+  </div>
+
+  <div class="diary-wrap">
+    <div class="diary-header">
+      <h1>Log</h1>
+      <div class="diary-header-line"></div>
+    </div>
+
+    <button class="new-entry-btn" id="new-entry-btn">
+      <span>✦</span> New entry
+    </button>
+
+    <div class="entry-form" id="entry-form">
+      <input class="form-input" type="text" id="entry-title-input" placeholder="title" />
+      <textarea class="form-textarea" id="entry-body-input" placeholder="今日のこと、書いてください。"></textarea>
+      <div class="form-actions">
+        <button class="btn-cancel" id="btn-cancel">Cancel</button>
+        <button class="btn-post" id="btn-post">Post</button>
+      </div>
+    </div>
+
+    <div class="entries" id="entries-list">
+      <div class="loading-note">— loading —</div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-line blue"></div>
+    <span class="footer-text">Remember the promise.</span>
+    <div class="footer-line gold"></div>
+  </footer>
+</div>
+
   <!-- マリンスノー背景 -->
 <script>
 const canvas = document.getElementById('bg');
