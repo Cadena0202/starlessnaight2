@@ -580,8 +580,8 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 // ---- パスワード設定 ----
-const READ_PASSWORD  = 'remember';   // 読む用
-const WRITE_PASSWORD = 'azul2024';   // 書く用（自分だけ）
+const READ_PASSWORD  = 'ppdrm';   // 読む用
+const WRITE_PASSWORD = '2243';   // 書く用（自分だけ）
 
 let isOwner = false;
 let allEntries = [];
@@ -725,7 +725,7 @@ function renderCards() {
   const filtered = currentCat === 'all' ? allEntries : allEntries.filter(e => e.category === currentCat);
   grid.innerHTML = '';
   if (filtered.length === 0) {
-    grid.innerHTML = '<div class="empty-note">— まだ何も書かれていない —</div>';
+    grid.innerHTML = '<div class="empty-note">— 未だない —</div>';
     return;
   }
   filtered.forEach((entry, i) => {
